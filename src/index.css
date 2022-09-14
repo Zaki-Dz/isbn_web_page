@@ -1,0 +1,98 @@
+:root {
+  --dark: #0f1f47;
+  --light: #46a0de;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  scroll-behavior: smooth;
+  color: inherit;
+}
+
+button {
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+img {
+  width: 100%;
+}
+
+body {
+  font-family: Roboto, arial, sans-serif;
+  color: var(--dark);
+  /*background-color: #f7f5f9;*/
+  background-color: white;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  padding-block: 60px;
+}
+
+.logo {
+  width: 100px;
+}
+
+.brand {
+  width: 200px;
+}
+
+.custom-input {
+  width: 300px;
+  height: 50px;
+  border: 3px solid var(--light);
+  position: relative;
+}
+
+input {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+p {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 1rem;
+  color: var(--dark);
+  z-index: -1;
+}
+
+.browse {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--light);
+  height: 100%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1rem;
+  scale: 1.1;
+  border: none;
+  z-index: -1;
+}
+
+.upload {
+  text-transform: uppercase;
+  color: white;
+  font-weight: bold;
+  background-color: var(--light);
+  border: none;
+  width: 300px;
+  height: 50px;
+}
