@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import * as XLSX from "xlsx/xlsx.mjs";
 import { saveAs } from "file-saver";
 
-import { ref, set, onValue } from "firebase/database";
+import { ref, set, onValue, remove } from "firebase/database";
 import { db, auth } from "./firebase";
 
 import Logo from "./assets/logo.svg";
@@ -44,6 +44,9 @@ const App = () => {
 
 	const handleButton = () => {
 		if (books.length != 0) {
+			// Delete everything in DB
+			remove(ref(db, "books"));
+
 			books.map((book) => {
 				const reference = ref(db, "books/" + book.ISBN);
 
@@ -78,8 +81,6 @@ const App = () => {
 		});
 
 		if (res.length != 0) {
-			console.log(res);
-
 			exportDataToExcel(res);
 		} else {
 			alert("Aucun fichier trouvé!");
@@ -99,6 +100,26 @@ const App = () => {
 		const res = new Blob([excelBuffer], { type: fileType });
 
 		saveAs(res, "test.xlsx");
+	};
+
+	const handleNewDownload = () => {
+		const reference = ref(db, "notFound/");
+
+		let res = [];
+
+		onValue(reference, (snapshot) => {
+			let data = snapshot.val();
+
+			for (const key in data) {
+				res.push(data[key]);
+			}
+		});
+
+		if (res.length != 0) {
+			exportDataToExcel(res);
+		} else {
+			alert("Aucun fichier trouvé!");
+		}
 	};
 
 	return (
@@ -128,7 +149,11 @@ const App = () => {
 			</button>
 
 			<button className="upload" onClick={handleDownload}>
-				Download
+				Telecharger
+			</button>
+
+			<button className="upload" onClick={handleNewDownload}>
+				Telecharger (Introuvable)
 			</button>
 		</div>
 	);
