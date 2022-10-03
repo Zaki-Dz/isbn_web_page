@@ -56,7 +56,6 @@ const App = () => {
 					QTE: book["QTE LIV"],
 					TITLE: book.TITRE,
 					ARRIVED_QTE: 0,
-					CALCULATION: 0,
 				});
 			});
 
@@ -67,24 +66,79 @@ const App = () => {
 	};
 
 	// DOWNLOAD FUNCTION
-	const handleDownload = () => {
+	const handleDownload = async () => {
 		const reference = ref(db, "books");
 
 		let res = [];
 
-		onValue(reference, (snapshot) => {
+		await onValue(reference, (snapshot) => {
 			let data = snapshot.val();
 
-			for (const key in data) {
-				res.push(data[key]);
+			if (data) {
+				for (const key in data) {
+					res.push(data[key]);
+				}
+
+				res.map((book) => {
+					let arrived = book.ARRIVED_QTE;
+					let qte = book.QTE;
+
+					if (arrived > qte) {
+						book.STOCK = arrived - qte;
+					} else if (arrived <= qte) {
+						book.STOCK = 0;
+					}
+
+					if (book.CLIENT.split("+").length > 1) {
+						let jaw = arrived;
+
+						let newData = book.CLIENT.split("+").map((clients) => {
+							let clientName = clients.split("/")[1];
+							let clientQTE = clients.split("/")[0];
+
+							if (arrived == 0) {
+								return 0 + "/" + clientName;
+							} else if (arrived >= qte) {
+								return clientQTE + "/" + clientName;
+							} else if (arrived < qte) {
+								if (jaw <= clientQTE) {
+									let temp = jaw;
+
+									jaw = 0;
+
+									return temp + "/" + clientName;
+								} else if (jaw > clientQTE) {
+									let temp = jaw;
+
+									jaw -= clientQTE;
+
+									return clientQTE + "/" + clientName;
+								}
+							}
+						});
+
+						book.CLIENT = newData.join("+");
+					} else {
+						let clientName = book.CLIENT;
+						let clientQTE;
+
+						if (arrived == 0) {
+							book.CLIENT = 0 + "/" + clientName;
+						} else if (arrived >= qte) {
+							book.CLIENT = qte + "/" + clientName;
+						} else {
+							book.CLIENT = arrived + "/" + clientName;
+						}
+					}
+				});
+
+				console.log(res);
+
+				exportDataToExcel(res);
+			} else {
+				alert("Aucun fichier trouvé!");
 			}
 		});
-
-		if (res.length != 0) {
-			exportDataToExcel(res);
-		} else {
-			alert("Aucun fichier trouvé!");
-		}
 	};
 
 	const exportDataToExcel = async (data) => {
